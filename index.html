@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JustInLovewithME - A Love Letter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fce7f3;
+            color: #831843;
+            overflow-x: hidden;
+        }
+        .font-cursive {
+            font-family: 'Dancing Script', cursive;
+        }
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .heart-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 50%, #f9a8d4 100%);
+            z-index: -1;
+        }
+        .floating-heart {
+            position: absolute;
+            color: #e11d48;
+            opacity: 0.6;
+            animation: float 15s infinite linear;
+            z-index: -1;
+        }
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.8; }
+            90% { opacity: 0.8; }
+            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+            color: white;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(236, 72, 153, 0.3);
+        }
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            color: #be185d;
+            transition: all 0.3s ease;
+        }
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.8);
+        }
+        .input-field {
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(236, 72, 153, 0.2);
+            transition: all 0.3s ease;
+        }
+        .input-field:focus {
+            background: white;
+            border-color: #ec4899;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1);
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .music-player {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .photo-preview {
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        .spotify-embed {
+            border-radius: 12px;
+            width: 100%;
+            max-width: 300px;
+        }
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            background: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 100;
+        }
+        .toast.show {
+            transform: translateX(0);
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 24px;
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body class="min-h-screen relative">
+    <div class="heart-bg"></div>
+    
+    <!-- Floating Hearts Animation Container -->
+    <div id="hearts-container" class="fixed inset-0 pointer-events-none overflow-hidden"></div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <div class="flex items-center">
+            <i class="fas fa-check-circle text-green-500 mr-3 text-xl"></i>
+            <span id="toast-message">Success!</span>
+        </div>
+    </div>
+
+    <!-- View Love Letter Modal -->
+    <div id="love-letter-modal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="font-cursive text-3xl font-bold text-pink-700">Love Letter</h3>
+                <button onclick="closeModal()" class="text-pink-400 hover:text-pink-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div id="modal-content" class="space-y-4">
+                <!-- Content will be injected here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="glass-nav fixed w-full z-50 top-0">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center mr-3">
+                        <i class="fas fa-envelope text-pink-500"></i>
+                    </div>
+                    <span class="font-cursive text-xl font-bold text-pink-700">JustInLovewithME</span>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#submit" class="text-pink-600 hover:text-pink-800 font-medium transition">Submit</a>
+                    <a href="#photobooth" class="text-pink-600 hover:text-pink-800 font-medium transition">Photo Booth</a>
+                    <a href="#browse" class="text-pink-600 hover:text-pink-800 font-medium transition">Browse</a>
+                    <a href="#history" class="text-pink-600 hover:text-pink-800 font-medium transition">History</a>
+                    <a href="#support" class="text-pink-600 hover:text-pink-800 font-medium transition">Support</a>
+                </div>
+                <div class="md:hidden">
+                    <button class="text-pink-600">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-32 pb-20 px-4 text-center relative z-10">
+        <div class="max-w-4xl mx-auto">
+            <h1 class="font-cursive text-6xl md:text-7xl font-bold text-white drop-shadow-lg mb-6">
+                a love letter
+            </h1>
+            <h2 class="font-cursive text-5xl md:text-6xl font-bold text-white drop-shadow-lg mb-8">
+                for a special someone
+            </h2>
+            <p class="text-pink-100 text-lg md:text-xl mb-10 max-w-2xl mx-auto leading-relaxed">
+                This Valentine's, let the music and pictures of you together say what your heart can't. Share your untold love story through a song.
+            </p>
+            <div class="flex flex-col md:flex-row justify-center gap-4">
+                <a href="#submit" class="btn-primary px-8 py-4 rounded-full font-semibold text-lg flex items-center justify-center">
+                    <i class="fas fa-heart mr-2"></i> Write a Love Letter
+                </a>
+                <a href="#photobooth" class="btn-secondary px-8 py-4 rounded-full font-semibold text-lg flex items-center justify-center">
+                    <i class="fas fa-camera mr-2"></i> Photo Booth
+                </a>
+                <a href="#browse" class="btn-secondary px-8 py-4 rounded-full font-semibold text-lg flex items-center justify-center">
+                    <i class="fas fa-music mr-2"></i> Browse Love Stories
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Submit Section -->
+    <section id="submit" class="py-20 px-4 relative z-10">
+        <div class="max-w-3xl mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="font-cursive text-5xl font-bold text-pink-700 mb-4">share your love story</h2>
+                <p class="text-pink-600">Send your valentine a message through the song that speaks your heart</p>
+            </div>
+            
+            <div class="card rounded-3xl p-8 md:p-12">
+                <form id="love-letter-form" class="space-y-6">
+                    <div>
+                        <label class="block text-pink-700 font-medium mb-2">To: *</label>
+                        <input type="text" id="recipient" placeholder="your valentine's name..." class="input-field w-full px-4 py-3 rounded-xl" required>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-pink-700 font-medium mb-2">Your Love Letter *</label>
+                        <textarea id="message" rows="4" placeholder="write the words your heart whispers..." class="input-field w-full px-4 py-3 rounded-xl" maxlength="500" required></textarea>
+                        <p class="text-xs text-pink-400 mt-1 text-right"><span id="char-count">0</span>/500 characters</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-pink-700 font-medium mb-2">Song Title *</label>
+                            <input type="text" id="song-title" placeholder="your love song..." class="input-field w-full px-4 py-3 rounded-xl" required>
+                        </div>
+                        <div>
+                            <label class="block text-pink-700 font-medium mb-2">Artist *</label>
+                            <input type="text" id="artist" placeholder="artist name..." class="input-field w-full px-4 py-3 rounded-xl" required>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-pink-700 font-medium mb-2">Spotify Song URI (Optional)</label>
+                        <input type="text" id="spotify-uri" placeholder="spotify:track:..." class="input-field w-full px-4 py-3 rounded-xl">
+                        <p class="text-xs text-pink-400 mt-1">Paste Spotify song link to enable playback</p>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-pink-700 font-medium mb-2">From (Optional)</label>
+                        <input type="text" id="sender" placeholder="your secret admirer name..." class="input-field w-full px-4 py-3 rounded-xl">
+                    </div>
+                    
+                    <button type="submit" class="btn-primary w-full py-4 rounded-xl font-semibold text-lg flex items-center justify-center">
+                        <i class="fas fa-heart mr-2"></i> Send Your Love Letter
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Browse Section -->
+    <section id="browse" class="py-20 px-4 relative z-10">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="font-cursive text-5xl font-bold text-pink-700 mb-4">love stories from the heart</h2>
+                <p class="text-pink-600">Read valentines shared through the language of music</p>
+            </div>
+            
+            <div id="love-stories-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Love stories will be dynamically loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Photo Booth Section -->
+    <section id="photobooth" class="py-20 px-4 relative z-10 bg-white/30">
+        <div class="max-w-5xl mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="font-cursive text-5xl font-bold text-pink-700 mb-4">valentine's photo booth</h2>
+                <p class="text-pink-600">Upload your favorite photos, add frames & stickers, and create a beautiful Valentine's collage to share</p>
+            </div>
+            
+            <div class="card rounded-3xl p-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-pink-700 font-semibold">Your Photos</h3>
+                    <div class="flex space-x-2">
+                        <button onclick="setLayout('2x2')" class="layout-btn px-4 py-2 rounded-full bg-pink-500 text-white text-sm font-medium" data-layout="2x2">2×2</button>
+                        <button onclick="setLayout('strip')" class="layout-btn px-4 py-2 rounded-full bg-pink-100 text-pink-600 text-sm font-medium hover:bg-pink-200" data-layout="strip">Strip</button>
+                        <button onclick="setLayout('trio')" class="layout-btn px-4 py-2 rounded-full bg-pink-100 text-pink-600 text-sm font-medium hover:bg-pink-200" data-layout="trio">Trio</button>
+                    </div>
+                </div>
+                
+                <div id="photo-grid" class="grid grid-cols-2 gap-4 mb-8">
+                    <div class="photo-slot border-2 border-dashed border-pink-300 rounded-2xl h-48 flex flex-col items-center justify-center text-pink-400 hover:border-pink-500 hover:bg-pink-50 transition cursor-pointer" onclick="uploadPhoto(0)">
+                        <i class="fas fa-camera text-3xl mb-2"></i>
+                        <span class="text-sm">Click to upload</span>
+                        <span class="text-xs">JPG, PNG</span>
+                        <input type="file" id="photo-input-0" accept="image/*" class="hidden" onchange="handlePhotoUpload(event, 0)">
+                    </div>
+                    <div class="photo-slot border-2 border-dashed border-pink-300 rounded-2xl h-48 flex flex-col items-center justify-center text-pink-400 hover:border-pink-500 hover:bg-pink-50 transition cursor-pointer" onclick="uploadPhoto(1)">
+                        <i class="fas fa-camera text-3xl mb-2"></i>
+                        <span class="text-sm">Click to upload</span>
+                        <span class="text-xs">JPG, PNG</span>
+                        <input type="file" id="photo-input-1" accept="image/*" class="hidden" onchange="handlePhotoUpload(event, 1)">
+                    </div>
+                    <div class="photo-slot border-2 border-dashed border-pink-300 rounded-2xl h-48 flex flex-col items-center justify-center text-pink-400 hover:border-pink-500 hover:bg-pink-50 transition cursor-pointer" onclick="uploadPhoto(2)">
+                        <i class="fas fa-camera text-3xl mb-2"></i>
+                        <span class="text-sm">Click to upload</span>
+                        <span class="text-xs">JPG, PNG</span>
+                        <input type="file" id="photo-input-2" accept="image/*" class="hidden" onchange="handlePhotoUpload(event, 2)">
+                    </div>
+                    <div class="photo-slot border-2 border-dashed border-pink-300 rounded-2xl h-48 flex flex-col items-center justify-center text-pink-400 hover:border-pink-500 hover:bg-pink-50 transition cursor-pointer" onclick="uploadPhoto(3)">
+                        <i class="fas fa-camera text-3xl mb-2"></i>
+                        <span class="text-sm">Click to upload</span>
+                        <span class="text-xs">JPG, PNG</span>
+                        <input type="file" id="photo-input-3" accept="image/*" class="hidden" onchange="handlePhotoUpload(event, 3)">
+                    </div>
+                </div>
+                
+                <div class="mb-6">
+                    <input type="text" id="photo-caption" placeholder="Add a sweet caption... 💕" class="input-field w-full px-4 py-3 rounded-xl">
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white/50 rounded-xl p-4">
+                        <h4 class="text-pink-700 font-medium mb-3 flex items-center"><i class="fas fa-image mr-2"></i> Frames</h4>
+                        <div class="flex space-x-2">
+                            <button onclick="applyFilter('none')" class="w-12 h-12 rounded-lg border-2 border-pink-300 hover:border-pink-500 transition"></button>
+                            <button onclick="applyFilter('heart')" class="w-12 h-12 rounded-lg border-2 border-pink-300 hover:border-pink-500 transition bg-pink-100">❤️</button>
+                            <button onclick="applyFilter('flowers')" class="w-12 h-12 rounded-lg border-2 border-pink-300 hover:border-pink-500 transition bg-pink-100">🌸</button>
+                        </div>
+                    </div>
+                    <div class="bg-white/50 rounded-xl p-4">
+                        <h4 class="text-pink-700 font-medium mb-3 flex items-center"><i class="fas fa-smile mr-2"></i> Stickers</h4>
+                        <div class="flex space-x-2">
+                            <button onclick="addSticker('❤️')" class="w-10 h-10 rounded-lg bg-pink-100 hover:bg-pink-200 transition text-xl">❤️</button>
+                            <button onclick="addSticker('💕')" class="w-10 h-10 rounded-lg bg-pink-100 hover:bg-pink-200 transition text-xl">💕</button>
+                            <button onclick="addSticker('💖')" class="w-10 h-10 rounded-lg bg-pink-100 hover:bg-pink-200 transition text-xl">💖</button>
+                            <button onclick="addSticker('🌹')" class="w-10 h-10 rounded-lg bg-pink-100 hover:bg-pink-200 transition text-xl">🌹</button>
+                        </div>
+                    </div>
+                    <div class="bg-white/50 rounded-xl p-4">
+                        <h4 class="text-pink-700 font-medium mb-3 flex items-center"><i class="fas fa-magic mr-2"></i> Filters</h4>
+                        <div class="flex space-x-2 overflow-x-auto scrollbar-hide">
+                            <button onclick="applyPhotoFilter('none')" class="flex-shrink-0 w-16 h-16 rounded-lg bg-pink-200 hover:opacity-80 transition">Original</button>
+                            <button onclick="applyPhotoFilter('sepia')" class="flex-shrink-0 w-16 h-16 rounded-lg bg-amber-200 hover:opacity-80 transition">Sepia</button>
+                            <button onclick="applyPhotoFilter('grayscale')" class="flex-shrink-0 w-16 h-16 rounded-lg bg-gray-200 hover:opacity-80 transition">B&W</button>
+                            <button onclick="applyPhotoFilter('warm')" class="flex-shrink-0 w-16 h-16 rounded-lg bg-orange-200 hover:opacity-80 transition">Warm</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="space-y-4">
+                    <button onclick="downloadCollage()" class="btn-primary w-full py-4 rounded-xl font-semibold text-lg flex items-center justify-center">
+                        <i class="fas fa-download mr-2"></i> Download Collage
+                    </button>
+                    <button onclick="shareToInstagram()" class="w-full py-4 rounded-xl font-semibold text-lg flex items-center justify-center bg-gradient-to-r from-purple-500 to-orange-500 text-white hover:opacity-90 transition">
+                        <i class="fab fa-instagram mr-2"></i> Share to Instagram
+                    </button>
+                    <p class="text-xs text-pink-400 text-center">Tip: On mobile, tap "Share to Instagram" to post directly. On desktop, download and upload from your computer!</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer CTA -->
+    <section class="py-20 px-4 relative z-10">
+        <div class="max-w-4xl mx-auto text-center">
+            <div class="w-16 h-16 mx-auto mb-6 bg-pink-100 rounded-full flex items-center justify-center">
+                <i class="fas fa-heart text-pink-500 text-2xl"></i>
+            </div>
+            <h2 class="font-cursive text-5xl font-bold text-white drop-shadow-lg mb-4">Love isn't just about love</h2>
+            <p class="text-pink-100 text-lg mb-8 max-w-xl mx-auto">Don't let this Valentine's pass without telling them. Let a song carry the words you've been holding inside.</p>
+            <a href="#submit" class="bg-white text-pink-600 px-8 py-4 rounded-full font-semibold text-lg inline-flex items-center hover:bg-pink-50 transition">
+                <i class="fas fa-pen mr-2"></i> Write Your Valentine
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-white/50 backdrop-blur-md py-12 relative z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center mb-4 md:mb-0">
+                    <div class="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center mr-3">
+                        <i class="fas fa-envelope text-pink-500"></i>
+                    </div>
+                    <span class="font-cursive text-xl font-bold text-pink-700">JustInLovewithME</span>
+                </div>
+                <div class="flex space-x-6 text-pink-600">
+                    <a href="#" class="hover:text-pink-800 transition">TikTok</a>
+                    <a href="#" class="hover:text-pink-800 transition">Send Feedback</a>
+                    <a href="#" class="hover:text-pink-800 transition">Support</a>
+                </div>
+            </div>
+            <div class="border-t border-pink-200 mt-8 pt-8 text-center text-pink-400 text-sm">
+                © JustInLovewithME. Made with <i class="fas fa-heart text-pink-500"></i> · Powered by Readdy
+            </div>
+        </div>
+    </footer>
+
+    <!-- Music Player Widget -->
+    <div class="fixed bottom-6 left-6 z-50">
+        <button id="music-toggle" class="w-14 h-14 rounded-full btn-primary flex items-center justify-center shadow-lg hover:scale-110 transition">
+            <i class="fas fa-music text-xl"></i>
+        </button>
+        
+        <div id="music-player" class="music-player absolute bottom-16 left-0 w-80 rounded-2xl p-4 hidden transform origin-bottom-left transition-all duration-300 scale-90 opacity-0">
+            <div class="flex justify-between items-center mb-4">
+                <span class="text-xs font-bold text-pink-400 uppercase tracking-wider">Now Playing</span>
+                <button id="close-player" class="text-pink-300 hover:text-pink-500">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="flex items-center mb-4">
+                <div id="current-album" class="w-16 h-16 bg-gradient-to-br from-pink-400 to-red-500 rounded-lg mr-4 flex items-center justify-center text-white">
+                    <i class="fas fa-heart text-2xl"></i>
+                </div>
+                <div class="flex-1">
+                    <h4 id="current-song" class="font-bold text-pink-800">Perfect</h4>
+                    <p id="current-artist" class="text-sm text-pink-500">Ed Sheeran</p>
+                </div>
+                <button id="like-btn" class="text-pink-400 hover:text-pink-600" onclick="toggleLike()">
+                    <i class="far fa-heart"></i>
+                </button>
+            </div>
+            
+            <div class="mb-4">
+                <div class="h-1 bg-pink-100 rounded-full mb-2 cursor-pointer" id="progress-bar">
+                    <div id="progress" class="h-1 bg-pink-500 rounded-full w-1/3"></div>
+                </div>
+                <div class="flex justify-between text-xs text-pink-400">
+                    <span id="current-time">0:00</span>
+                    <span id="total-time">4:23</span>
+                </div>
+            </div>
+            
+            <div class="flex justify-center items-center space-x-6 mb-6">
+                <button class="text-pink-400 hover:text-pink-600" onclick="toggleShuffle()"><i id="shuffle-btn" class="fas fa-random"></i></button>
+                <button class="text-pink-600 hover:text-pink-800" onclick="previousSong()"><i class="fas fa-step-backward"></i></button>
+                <button id="play-pause-btn" class="w-12 h-12 rounded-full bg-pink-500 text-white flex items-center justify-center hover:bg-pink-600" onclick="togglePlay()">
+                    <i class="fas fa-play ml-1"></i>
+                </button>
+                <button class="text-pink-600 hover:text-pink-800" onclick="nextSong()"><i class="fas fa-step-forward"></i></button>
+                <button class="text-pink-400 hover:text-pink-600" onclick="toggleRepeat()"><i id="repeat-btn" class="fas fa-redo"></i></button>
+            </div>
+            
+            <div>
+                <h5 class="text-xs font-bold text-pink-400 uppercase tracking-wider mb-3">Romantic Playlist</h5>
+                <div id="playlist" class="space-y-2 max-h-40 overflow-y-auto scrollbar-hide">
+                    <!-- Playlist items will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data Storage
+        let loveLetters = JSON.parse(localStorage.getItem('loveLetters')) || [
+            {
+                id: 1,
+                recipient: 'Sarah',
+                message: 'every heartbeat whispers your name... i never told you, but you were always the one',
+                songTitle: 'Lover',
+                artist: 'Taylor Swift',
+                sender: 'Anonymous',
+                timestamp: new Date(Date.now() - 3600000).toISOString(),
+                spotifyUri: ''
+            },
+            {
+                id: 2,
+                recipient: 'Zahra',
+                message: 'i wrote your name on every page of my heart... some chapters are just too beautiful to share out loud',
+                songTitle: 'All of Me',
+                artist: 'John Legend',
+                sender: 'Anonymous',
+                timestamp: new Date(Date.now() - 10800000).toISOString(),
+                spotifyUri: ''
+            },
+            {
+                id: 3,
+                recipient: 'Louis',
+                message: 'you held my hand like it was the most precious thing... i still feel the warmth',
+                songTitle: 'Perfect',
+                artist: 'Ed Sheeran',
+                sender: 'Anonymous',
+                timestamp: new Date(Date.now() - 18000000).toISOString(),
+                spotifyUri: ''
+            }
+        ];
+
+        let photos = [null, null, null, null];
+        let currentLayout = '2x2';
+        let currentFilter = 'none';
+        let stickers = [];
+
+        // Music Player State
+        let isPlaying = false;
+        let currentSongIndex = 0;
+        let isShuffle = false;
+        let isRepeat = false;
+        let progress = 33;
+
+        const playlist = [
+            { title: 'Perfect', artist: 'Ed Sheeran', duration: '4:23', album: '÷' },
+            { title: 'All of Me', artist: 'John Legend', duration: '4:29', album: 'Love in the Future' },
+            { title: 'Thinking Out Loud', artist: 'Ed Sheeran', duration: '4:41', album: 'x' },
+            { title: 'A Thousand Years', artist: 'Christina Perri', duration: '4:45', album: 'The Twilight Saga' },
+            { title: 'Make You Feel My Love', artist: 'Adele', duration: '3:32', album: '19' },
+            { title: 'Can\'t Help Falling in Love', artist: 'Elvis Presley', duration: '3:02', album: 'Blue Hawaii' }
+        ];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadLoveStories();
+            loadPlaylist();
+            createFloatingHearts();
+            setupEventListeners();
+        });
+
+        // Setup Event Listeners
+        function setupEventListeners() {
+            // Form submission
+            document.getElementById('love-letter-form').addEventListener('submit', handleFormSubmit);
+            
+            // Character count
+            document.getElementById('message').addEventListener('input', (e) => {
+                document.getElementById('char-count').textContent = e.target.value.length;
+            });
+
+            // Music player toggle
+            document.getElementById('music-toggle').addEventListener('click', toggleMusicPlayer);
+            document.getElementById('close-player').addEventListener('click', closeMusicPlayer);
+
+            // Progress bar click
+            document.getElementById('progress-bar').addEventListener('click', (e) => {
+                const rect = e.target.getBoundingClientRect();
+                const clickX = e.clientX - rect.left;
+                const width = rect.width;
+                progress = (clickX / width) * 100;
+                updateProgress();
+            });
+        }
+
+        // Load Love Stories
+        function loadLoveStories() {
+            const grid = document.getElementById('love-stories-grid');
+            grid.innerHTML = '';
+
+            loveLetters.forEach(letter => {
+                const card = document.createElement('div');
+                card.className = 'card rounded-2xl p-6 cursor-pointer hover:shadow-xl transition';
+                card.onclick = () => showLoveLetter(letter);
+                
+                const timeAgo = getTimeAgo(new Date(letter.timestamp));
+                
+                card.innerHTML = `
+                    <div class="text-sm text-pink-500 font-medium mb-2">TO: ${letter.recipient.toUpperCase()}</div>
+                    <p class="text-pink-800 italic mb-6 h-24 overflow-hidden">"${letter.message}"</p>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-gradient-to-br from-pink-400 to-red-500 rounded-lg mr-3 flex items-center justify-center text-white">
+                                <i class="fas fa-music"></i>
+                            </div>
+                            <div>
+                                <div class="font-semibold text-pink-700">${letter.songTitle}</div>
+                                <div class="text-sm text-pink-500">${letter.artist}</div>
+                            </div>
+                        </div>
+                        <button class="w-10 h-10 rounded-full bg-pink-500 text-white flex items-center justify-center hover:bg-pink-600 transition" onclick="event.stopPropagation(); playSpotifySong('${letter.songTitle}', '${letter.artist}')">
+                            <i class="fab fa-spotify"></i>
+                        </button>
+                    </div>
+                    <div class="text-xs text-pink-400 mt-4">${timeAgo}</div>
+                `;
+                
+                grid.appendChild(card);
+            });
+        }
+
+        // Show Love Letter Modal
+        function showLoveLetter(letter) {
+            const modal = document.getElementById('love-letter-modal');
+            const content = document.getElementById('modal-content');
+            
+            const timeAgo = getTimeAgo(new Date(letter.timestamp));
+            
+            content.innerHTML = `
+                <div class="space-y-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-heart text-pink-500"></i>
+                        </div>
+                        <div>
+                            <div class="font-semibold text-pink-700">To: ${letter.recipient}</div>
+                            <div class="text-sm text-pink-500">${timeAgo}</div>
+                        </div>
+                    </div>
+                    <div class="bg-pink-50 rounded-xl p-6">
+                        <p class="text-pink-800 italic text-lg">"${letter.message}"</p>
+                    </div>
+                    <div class="flex items-center justify-between bg-white rounded-xl p-4">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-gradient-to-br from-pink-400 to-red-500 rounded-lg mr-3 flex items-center justify-center text-white">
+                                <i class="fas fa-music"></i>
+                            </div>
+                            <div>
+                                <div class="font-semibold text-pink-700">${letter.songTitle}</div>
+                                <div class="text-sm text-pink-500">${letter.artist}</div>
+                            </div>
+                        </div>
+                        <button class="w-10 h-10 rounded-full bg-pink-500 text-white flex items-center justify-center hover:bg-pink-600 transition" onclick="playSpotifySong('${letter.songTitle}', '${letter.artist}')">
+                            <i class="fab fa-spotify"></i>
+                        </button>
+                    </div>
+                    ${letter.sender ? <div class="text-sm text-pink-500">From: ${letter.sender}</div> : ''}
+                </div>
+            `;
+            
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('love-letter-modal').classList.remove('active');
+        }
+
+        // Handle Form Submit
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            const newLetter = {
+                id: Date.now(),
+                recipient: document.getElementById('recipient').value,
+                message: document.getElementById('message').value,
+                songTitle: document.getElementById('song-title').value,
+                artist: document.getElementById('artist').value,
+                sender: document.getElementById('sender').value,
+                timestamp: new Date().toISOString(),
+                spotifyUri: document.getElementById('spotify-uri').value
+            };
+            
+            loveLetters.unshift(newLetter);
+            localStorage.setItem('loveLetters', JSON.stringify(loveLetters));
+            
+            loadLoveStories();
+            showToast('Love letter sent successfully! 💕');
+            e.target.reset();
+            document.getElementById('char-count').textContent = '0';
+        }
+
+        // Photo Upload Functions
+        function uploadPhoto(index) {
+            document.getElementById(photo-input-${index}).click();
+        }
+
+        function handlePhotoUpload(event, index) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    photos[index] = e.target.result;
+                    updatePhotoDisplay(index);
+                    showToast('Photo uploaded successfully! 📸');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function updatePhotoDisplay(index) {
+            const slot = document.querySelectorAll('.photo-slot')[index];
+            if (photos[index]) {
+                slot.style.backgroundImage = url(${photos[index]});
+                slot.innerHTML = '';
+                slot.classList.add('photo-preview');
+            }
+        }
+
+        function setLayout(layout) {
+            currentLayout = layout;
+            const grid = document.getElementById('photo-grid');
+            const buttons = document.querySelectorAll('.layout-btn');
+            
+            buttons.forEach(btn => {
+                btn.classList.remove('bg-pink-500', 'text-white');
+                btn.classList.add('bg-pink-100', 'text-pink-600');
+            });
+            
+            event.target.classList.remove('bg-pink-100', 'text-pink-600');
+            event.target.classList.add('bg-pink-500', 'text-white');
+            
+            if (layout === '2x2') {
+                grid.className = 'grid grid-cols-2 gap-4 mb-8';
+            } else if (layout === 'strip') {
+                grid.className = 'grid grid-cols-1 gap-4 mb-8';
+            } else if (layout === 'trio') {
+                grid.className = 'grid grid-cols-3 gap-4 mb-8';
+            }
+        }
+
+        function applyFilter(filter) {
+            // Apply frame filter
+            showToast(Filter ${filter} applied! ✨);
+        }
+
+        function addSticker(sticker) {
+            stickers.push(sticker);
+            showToast(Sticker ${sticker} added! 💕);
+        }
+
+        function applyPhotoFilter(filter) {
+            currentFilter = filter;
+            const slots = document.querySelectorAll('.photo-slot');
+            slots.forEach((slot, index) => {
+                if (photos[index]) {
+                    if (filter === 'sepia') {
+                        slot.style.filter = 'sepia(100%)';
+                    } else if (filter === 'grayscale') {
+                        slot.style.filter = 'grayscale(100%)';
+                    } else if (filter === 'warm') {
+                        slot.style.filter = 'sepia(30%) saturate(140%)';
+                    } else {
+                        slot.style.filter = 'none';
+                    }
+                }
+            });
+            showToast(Photo filter ${filter} applied! 🎨);
+        }
+
+        function downloadCollage() {
+            showToast('Collage downloaded! 📥');
+        }
+
+        function shareToInstagram() {
+            showToast('Ready to share to Instagram! 📱');
+        }
+
+        // Music Player Functions
+        function toggleMusicPlayer() {
+            const player = document.getElementById('music-player');
+            player.classList.remove('hidden');
+            setTimeout(() => {
+                player.classList.add('scale-100', 'opacity-100');
+                player.classList.remove('scale-90', 'opacity-0');
+            }, 10);
+        }
+
+        function closeMusicPlayer() {
+            const player = document.getElementById('music-player');
+            player.classList.add('scale-90', 'opacity-0');
+            player.classList.remove('scale-100', 'opacity-100');
+            setTimeout(() => {
+                player.classList.add('hidden');
+            }, 300);
+        }
+
+        function loadPlaylist() {
+            const playlistEl = document.getElementById('playlist');
+            playlistEl.innerHTML = '';
+            
+            playlist.forEach((song, index) => {
+                const item = document.createElement('div');
+                item.className = flex items-center p-2 rounded-lg cursor-pointer transition ${index === currentSongIndex ? 'bg-pink-50' : 'hover:bg-pink-50'};
+                item.onclick = () => playSong(index);
+                item.innerHTML = `
+                    <div class="w-8 h-8 bg-gradient-to-br from-pink-400 to-red-500 rounded mr-3 flex items-center justify-center text-white text-xs">
+                        <i class="fas fa-music"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="text-sm font-medium text-pink-800">${song.title}</div>
+                        <div class="text-xs text-pink-500">${song.artist}</div>
+                    </div>
+                    <div class="text-xs text-pink-400">${song.duration}</div>
+                `;
+                playlistEl.appendChild(item);
+            });
+        }
+
+        function playSong(index) {
+            currentSongIndex = index;
+            const song = playlist[index];
+            
+            document.getElementById('current-song').textContent = song.title;
+            document.getElementById('current-artist').textContent = song.artist;
+            document.getElementById('total-time').textContent = song.duration;
+            
+            isPlaying = true;
+            updatePlayButton();
+            loadPlaylist();
+            
+            // Simulate progress
+            progress = 0;
+            updateProgress();
+        }
+
+        function togglePlay() {
+            isPlaying = !isPlaying;
+            updatePlayButton();
+        }
+
+        function updatePlayButton() {
+            const btn = document.getElementById('play-pause-btn');
+            btn.innerHTML = isPlaying ? '<i class="fas fa-pause"></i>' : '<i class="fas fa-play ml-1"></i>';
+        }
+
+        function updateProgress() {
+            document.getElementById('progress').style.width = ${progress}%;
+            const totalSeconds = 263; // 4:23
+            const currentSeconds = Math.floor((progress / 100) * totalSeconds);
+            const minutes = Math.floor(currentSeconds / 60);
+            const seconds = currentSeconds % 60;
+            document.getElementById('current-time').textContent = ${minutes}:${seconds.toString().padStart(2, '0')};
+        }
+
+        function previousSong() {
+            currentSongIndex = currentSongIndex > 0 ? currentSongIndex - 1 : playlist.length - 1;
+            playSong(currentSongIndex);
+        }
+
+        function nextSong() {
+            if (isShuffle) {
+                currentSongIndex = Math.floor(Math.random() * playlist.length);
+            } else {
+                currentSongIndex = currentSongIndex < playlist.length - 1 ? currentSongIndex + 1 : 0;
+            }
+            playSong(currentSongIndex);
+        }
+
+        function toggleShuffle() {
+            isShuffle = !isShuffle;
+            document.getElementById('shuffle-btn').classList.toggle('text-pink-500');
+        }
+
+        function toggleRepeat() {
+            isRepeat = !isRepeat;
+            document.getElementById('repeat-btn').classList.toggle('text-pink-500');
+        }
+
+        function toggleLike() {
+            const btn = document.getElementById('like-btn');
+            btn.innerHTML = btn.innerHTML.includes('far') ? '<i class="fas fa-heart"></i>' : '<i class="far fa-heart"></i>';
+            btn.classList.toggle('text-pink-500');
+        }
+
+        function playSpotifySong(title, artist) {
+            // Search for song on Spotify
+            const searchUrl = https://open.spotify.com/search/${encodeURIComponent(title + ' ' + artist)};
+            window.open(searchUrl, '_blank');
+            
+            // Also load in player
+            const index = playlist.findIndex(s => s.title.toLowerCase() === title.toLowerCase());
+            if (index !== -1) {
+                playSong(index);
+            }
+        }
+
+        // Utility Functions
+        function getTimeAgo(date) {
+            const seconds = Math.floor((new Date() - date) / 1000);
+            
+            if (seconds < 60) return 'Just now';
+            if (seconds < 3600) return ${Math.floor(seconds / 60)} minutes ago;
+            if (seconds < 86400) return ${Math.floor(seconds / 3600)} hours ago;
+            if (seconds < 604800) return ${Math.floor(seconds / 86400)} days ago;
+            
+            return date.toLocaleDateString();
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        function createFloatingHearts() {
+            const container = document.getElementById('hearts-container');
+            
+            setInterval(() => {
+                const heart = document.createElement('div');
+                heart.classList.add('floating-heart');
+                heart.innerHTML = '❤️';
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.fontSize = Math.random() * 20 + 10 + 'px';
+                heart.style.animationDuration = Math.random() * 10 + 10 + 's';
+                container.appendChild(heart);
+                
+                setTimeout(() => {
+                    heart.remove();
+                }, 20000);
+            }, 1000);
+        }
+
+        // Smooth Scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // Close modal on outside click
+        document.getElementById('love-letter-modal').addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
